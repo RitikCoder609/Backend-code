@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import { subscribe } from "diagnostics_channel";
 import { appendFile } from "fs";
 import mongoose from "mongoose";
-
+   
 const genrateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -46,12 +46,20 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exist");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
+  // let coverImageLocalPath;
+  // if (
+  //   req.file &&
+  //   Array.isArray(req.files.coverImage) &&
+  //   req.files.coverImage.length > 0
+  // ) {
+  //   coverImageLocalPath = req.files.coverImage[0].path;
+  // }
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
   let coverImageLocalPath;
   if (
-    req.file &&
+    req.files?.coverImage &&
     Array.isArray(req.files.coverImage) &&
     req.files.coverImage.length > 0
   ) {
@@ -127,7 +135,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false,
   };
 
   return res
@@ -158,7 +166,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false,
   };
 
   return res
@@ -193,7 +201,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: false,
     };
 
     const { accessToken, newRefreshToken } =
@@ -405,13 +413,15 @@ const getWatchHistory = asyncHandler(async (req, res) => {
               localField: "owner",
               foreignField: "_id",
               as: "owner",
-              pipeline: [{
-                $project: {
-                  fullName: 1,
-                  username : 1,
-                  avatar: 1,
-                }
-              }]
+              pipeline: [
+                {
+                  $project: {
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1,
+                  },
+                },
+              ],
             },
           },
         ],
@@ -419,7 +429,15 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     },
   ]);
 
-  return res.status(200).json(new ApiResponse(200, user[0].watchHistory, "Watch History fetched successfully"))
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        user[0].watchHistory,
+        "Watch History fetched successfully"
+      )
+    );
 });
 
 export {
@@ -433,5 +451,5 @@ export {
   updateUserAvatar,
   updateUserCoverImage,
   getUserChannelProfile,
-  getWatchHistory
+  getWatchHistory,
 };
