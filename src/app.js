@@ -26,5 +26,13 @@ import postRouter from "./routes/post.routes.js";
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
 
+
+app.use((err, req, res, next) => {
+  return res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
 //localhost:8000/api/v1/users/register
 export { app };
