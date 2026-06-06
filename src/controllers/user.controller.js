@@ -29,6 +29,8 @@ const genrateAccessAndRefreshTokens = async (userId) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password, username } = req.body;
   // console.log("email:", email);
+  console.log("FILES => ", req.files);
+console.log("BODY => ", req.body);
 
   if (fullName === "") {
     throw new ApiError(400, "fullName is required");
