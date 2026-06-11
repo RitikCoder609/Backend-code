@@ -20,6 +20,8 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
     return response;
   } catch (error) {
+      console.log("CLOUDINARY ERROR =>", error);
+
     if (localFilePath && fs.existsSync(localFilePath)) {
       fs.unlinkSync(localFilePath);
     } //remove the file locally saved temprory file as the upload operation got failed
